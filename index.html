@@ -74,6 +74,7 @@ button { font: inherit; }
 .compare .card:last-child { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--accent-2) 25%, var(--surface))); }
 .flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; align-items: stretch; margin-top: 24px; }
 .flow-step { padding: 17px 13px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); min-height: 100px; position: relative; }
+.flow.five { grid-template-columns: repeat(5, 1fr); }
 .flow-step:not(:last-child)::after { content: "→"; position: absolute; right: -10px; top: 39px; color: var(--accent); z-index: 3; font-size: 16px; }
 .flow-step strong { display: block; font-size: 14px; }
 .flow-step span { display: block; margin-top: 8px; font-size: 11px; color: var(--muted); line-height: 1.4; }
@@ -106,6 +107,27 @@ button { font: inherit; }
 .eval-row { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); border-radius: 16px; }
 .eval-row strong { font-size: 13px; }
 .eval-row span { color: var(--muted); font-size: 13px; }
+.subhead { display:flex; align-items:baseline; gap:14px; margin:46px 0 18px; }
+.subhead .n { font-size:11px; color:var(--accent); font-weight:760; letter-spacing:.12em; white-space:nowrap; }
+.subhead h3 { margin:0; font-size:20px; letter-spacing:-.028em; }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.stat { padding:18px; border:1px solid var(--line); border-radius:18px; background:var(--surface); }
+.stat b { display:block; font-size:26px; font-weight:800; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+.stat span { display:block; margin-top:7px; font-size:12px; color:var(--muted); line-height:1.5; }
+.stat.good b { color:var(--good); }
+.stat.warn b { color:var(--warn); }
+.stat.danger b { color:var(--danger); }
+.tbl-wrap { border:1px solid var(--line); border-radius:18px; overflow:auto; background:var(--surface); }
+.dtable { width:100%; border-collapse:collapse; font-size:13px; }
+.dtable th { text-align:left; padding:11px 14px; background:var(--surface-2); color:var(--muted); font-weight:650; font-size:11px; letter-spacing:.07em; text-transform:uppercase; border-bottom:1px solid var(--line); white-space:nowrap; }
+.dtable td { padding:11px 14px; border-bottom:1px solid var(--line); color:var(--muted); vertical-align:top; }
+.dtable tr:last-child td { border-bottom:0; }
+.dtable td:first-child { color:var(--text); font-weight:620; }
+.dtable .num { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.pill.ok { background:color-mix(in srgb, var(--good) 15%, var(--surface-2)); color:var(--good); }
+.pill.bad { background:color-mix(in srgb, var(--danger) 15%, var(--surface-2)); color:var(--danger); }
+.pill.mid { background:color-mix(in srgb, var(--warn) 15%, var(--surface-2)); color:var(--warn); }
+.grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
 .prototype { display: grid; grid-template-columns: .8fr 1.2fr; gap: 18px; }
 .phone-wrap { display: flex; justify-content: center; }
 .phone { width: min(340px, 100%); border-radius: 34px; padding: 12px; background: #0d0f14; box-shadow: var(--shadow); }
@@ -146,7 +168,8 @@ button { font: inherit; }
 @media (max-width: 900px) {
   .container { width:min(100% - 28px, 720px); }
   .hero-panel { padding: 34px; border-radius: 28px; }
-  .hero-grid, .agent-layout, .eval, .prototype, .bottom-grid { grid-template-columns: 1fr; }
+  .hero-grid, .agent-layout, .eval, .prototype, .bottom-grid, .grid3 { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
   .section-head { grid-template-columns: 1fr; gap:8px; }
   .flow { grid-template-columns: repeat(3, 1fr); }
   .flow-step:not(:last-child)::after { display:none; }
@@ -165,6 +188,8 @@ button { font: inherit; }
   .two, .case-grid { grid-template-columns: 1fr; }
   .flow { grid-template-columns: 1fr; }
   .eval-row { grid-template-columns: 1fr; gap:6px; }
+  .stats { grid-template-columns: 1fr; }
+  .subhead { flex-direction:column; gap:6px; margin:36px 0 16px; }
 }
 </style>
 </head>
@@ -180,6 +205,7 @@ button { font: inherit; }
         <a href="#showcase">核心场景</a>
         <a href="#evaluation">Agent 评测</a>
         <a href="#prototype">原型</a>
+        <a href="#validation">验证状态</a>
         <a href="#about">我的贡献</a>
       </nav>
       <span class="badge">Agent 产品作品集</span>
@@ -347,21 +373,179 @@ button { font: inherit; }
 
     <section class="section" id="evaluation">
       <div class="container">
-        <div class="section-head reveal"><div class="section-number">08 · Agent 评测</div><div><h2 class="section-title">我怎么知道 Agent 做对了？</h2><p class="section-lead">把“设计判断”进一步转化为可重复测试的 Agent 评测。</p></div></div>
-        <div class="eval">
+        <div class="section-head reveal"><div class="section-number">08 · Agent 评测</div><div><h2 class="section-title">评测不是「跑一遍测试」，是把判断变成可判定的标准</h2><p class="section-lead">这一节是评测体系的设计、两轮实测结果，以及我自己推翻自己结论的那一次。设计判断要能被验证，前提是它得有对错；而「对错」必须独立于被测实现——否则测的是自己抄的答案。</p></div></div>
+
+        <div class="subhead reveal"><span class="n">01</span><h3>先把「对」写下来：正确行为与判定规则分开</h3></div>
+        <div class="eval reveal">
           <div class="stack">
-            <div class="card reveal"><div class="mini-label">评测闭环</div><h3>原子案例 → 测试数据 → 正确行为 → 试跑 → 评分</h3><p>题目和判法分开，避免 Agent 在试跑前看到自己的答案，也让每一次差异都有明确的判定依据。</p></div>
-            <div class="card reveal"><div class="mini-label">示例 · AC-04</div><h3>指代消解</h3><p>同一句“把那个改成在用”，分别构造 0、1、≥2 候选，验证 Agent 是否正确处理不确定性。</p></div>
+            <div class="eval-row"><strong>GT · 正确行为</strong><span>被测系统在给定输入下应该展现的输出与行为</span></div>
+            <div class="eval-row"><strong>Oracle · 判定规则</strong><span>试跑之后用来自动或人工判定通过或差异的规则</span></div>
+            <div class="eval-row"><strong>允许变化</strong><span>GT 允许的合理变体——不算差异</span></div>
+            <div class="eval-row"><strong>禁止行为</strong><span>绝对不能做的事，出现即为红线违规</span></div>
           </div>
-          <div class="eval-list">
-            <div class="eval-row reveal"><strong>结果</strong><span>用户目标是否完成</span></div>
-            <div class="eval-row reveal"><strong>对话</strong><span>用户实际看到了什么</span></div>
-            <div class="eval-row reveal"><strong>过程</strong><span>内部发生了什么：检索、匹配、工具调用</span></div>
-            <div class="eval-row reveal"><strong>状态</strong><span>权威状态如何变化</span></div>
-            <div class="eval-row reveal"><strong>真实动作</strong><span>外部动作是否真实发生</span></div>
-            <div class="eval-row reveal"><strong>最终判定</strong><span>通过 / 有差异 / 受阻 / 未评测，并单独检查红线</span></div>
+          <div class="logic-box">
+            <div class="mini-label">示例 · AC-01 记账主路径</div>
+            <pre>
+输入：「咖啡35」
+
+<span class="accent">正确行为（GT）</span>
+回复卡片显示 ¥35 · 一级=餐饮 · 二级=咖啡
+含「确认入账」「修正」按钮
+记录处于待确认状态，<span class="accent">未写入数据库</span>
+
+<span class="accent">允许变化</span>
+二级品类名可不同（咖啡 / 咖啡豆 同义）
+卡片布局可不同 · 语音与文字路径结果可一致
+
+<span class="accent">禁止行为</span>
+未经确认直接入账（RED-05）· 编造金额
+无金额输入时强行分配 · 拟造不存在的处理步骤
+            </pre>
+            <div style="margin-top:15px;padding-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.6;"><b style="color:var(--text);">「允许变化」这一段最关键</b>——它挡住了评测最常见的失败模式：把「文案不同」判成「功能失败」。</div>
           </div>
         </div>
+
+        <div class="subhead reveal"><span class="n">02</span><h3>判据要能被核，也要让被测系统读不到</h3></div>
+        <div class="two reveal">
+          <div class="card"><div class="mini-label">判据出处可核</div><h3>每条断言都指回规格条款</h3><p>232 条机器断言与 52 条人工判据，每一条都标注它来自哪条规格条款，由脚本逐条校验：题号存在、条款编号不越界、观察面名真实。284 条引用全部指向真实条款，并作为 CI 闸门——判据来源一旦对不上，构建直接失败。</p></div>
+          <div class="card"><div class="mini-label">四平面隔离</div><h3>把答案从运行包里搬出去</h3><p>运行输入、评测管控、构建、证据分成四个平面。期望金额、标准答案、案例编号映射全部放在「评测管控」平面，该平面对被测系统标记为不可读。隔离不靠文档声明，靠每次构建都跑检测器。</p></div>
+        </div>
+        <div class="tbl-wrap reveal" style="margin-top:14px;">
+          <table class="dtable">
+            <thead><tr><th>平面</th><th>装什么</th><th>被测系统能否读取</th></tr></thead>
+            <tbody>
+              <tr><td>运行输入</td><td>测试输入、前置状态、原始数据</td><td><span class="pill ok">可以</span></td></tr>
+              <tr><td>评测管控</td><td>期望值、标准答案、案例编号映射</td><td><span class="pill bad">不可以</span></td></tr>
+              <tr><td>构建</td><td>运行包与发布物</td><td><span class="pill mid">按发布物走</span></td></tr>
+              <tr><td>证据</td><td>试跑记录与权威状态读回</td><td><span class="pill mid">不参与推理</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subhead reveal"><span class="n">03</span><h3>五个观察面，四态判定</h3></div>
+        <div class="eval reveal">
+          <div class="stack">
+            <div class="eval-row"><strong>结果</strong><span>用户目标是否完成</span></div>
+            <div class="eval-row"><strong>对话</strong><span>用户实际看到了什么</span></div>
+            <div class="eval-row"><strong>过程</strong><span>内部发生了什么：检索、匹配、工具调用</span></div>
+            <div class="eval-row"><strong>状态</strong><span>权威状态如何变化</span></div>
+            <div class="eval-row"><strong>真实动作</strong><span>外部动作是否真实发生</span></div>
+          </div>
+          <div class="card">
+            <div class="mini-label">总判定规则</div>
+            <h3>四态，不是两态</h3>
+            <p>一致 <b>observed_match</b> / 有差异但没踩红线 <b>observed_gap</b> / 前提阻断无法观察 <b>blocked</b> / 本轮没看 <b>not_evaluated</b>。</p>
+            <p style="margin-top:12px;">全部一致才算通过；有差异记为 Bad Case；踩红线直接判负；<b>受阻不算通过</b>——把「没看见」当成「没问题」，是评测里最容易犯的错。</p>
+            <p style="margin-top:12px;">红线单独统计，不参与平均。一个平均分能盖住的数据损坏，比没有分数更危险。</p>
+          </div>
+        </div>
+
+        <div class="subhead reveal"><span class="n">04</span><h3>第一轮跑下来：Detect 五步</h3></div>
+        <div class="flow five reveal">
+          <div class="flow-step"><strong>① 评测简报</strong><span>业务 / 产品 / 能力三层标准 + 锁定被测版本</span></div>
+          <div class="flow-step"><strong>② 题集计划</strong><span>12 个原子案例 + 27 份测试数据 + 隔离验证</span></div>
+          <div class="flow-step"><strong>③ 运行计划</strong><span>4 条旅程 + 就绪门全通过</span></div>
+          <div class="flow-step"><strong>④ 逐项评分</strong><span>逐案例逐项判定 + 证据引用 + 置信信号</span></div>
+          <div class="flow-step"><strong>⑤ 评测结论</strong><span>CONDITIONAL_GO + 6 项进入条件</span></div>
+        </div>
+        <div class="stats reveal" style="margin-top:18px;">
+          <div class="stat good"><b>12 / 12</b><span>原子案例全部判定通过</span></div>
+          <div class="stat"><b>27</b><span>份测试数据 Fixture</span></div>
+          <div class="stat good"><b>97.8%</b><span>有效评分率（69 有效分 / 70 总分）</span></div>
+          <div class="stat good"><b>5 / 5</b><span>红线零违反</span></div>
+        </div>
+        <div class="tbl-wrap reveal" style="margin-top:14px;">
+          <table class="dtable">
+            <thead><tr><th>观察面</th><th>指标</th><th>值</th><th>分母</th><th>覆盖率</th></tr></thead>
+            <tbody>
+              <tr><td>结果</td><td>结果正确率</td><td class="num">100%</td><td class="num">12</td><td class="num">100%</td></tr>
+              <tr><td>对话</td><td>对话完整率</td><td class="num">100%</td><td class="num">12</td><td class="num">100%</td></tr>
+              <tr><td>过程</td><td>执行轨迹正确率</td><td class="num">100%</td><td class="num">12</td><td class="num">100%</td></tr>
+              <tr><td>状态</td><td>状态正确率</td><td class="num">100%</td><td class="num">12</td><td class="num">100%</td></tr>
+              <tr><td>真实动作</td><td>真实动作成功率</td><td class="num">100%</td><td class="num">10</td><td class="num">83%（2 项受阻，不计入分母）</td></tr>
+              <tr><td>红线</td><td>红线遵守率</td><td class="num">100%</td><td class="num">5</td><td class="num">100%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout reveal"><div class="mini-label">这一轮的结论</div><div class="quote" style="margin-top:8px;">CONDITIONAL_GO —— 主线全通过、红线零违反，但带 6 项进入条件。</div><div class="prose" style="margin-top:12px;font-size:13px;">业务指标、产品任务和局部能力是分层的，不能粗暴加权成一个总分；这一轮只证明「离线受控试跑下行为符合规格」，不证明长期留存。</div></div>
+
+        <div class="subhead reveal"><span class="n">05</span><h3>然后我没有相信这份绿灯</h3></div>
+        <div class="callout reveal"><div class="quote">12 / 12 全 Pass、红线 5 / 5 —— 我判定这份结论失效，重建隔离后重跑。</div><div style="margin-top:12px;color:var(--muted);font-size:13px;">触发这次自查的不是试跑失败，而是代码走查与实测复验：绿灯和「结论成立」之间，没有必然关系。</div></div>
+        <div class="two reveal" style="margin-top:14px;">
+          <div class="card"><div class="mini-label">自查发现 01</div><h3>置信度分数从未被算法算出来</h3><p>期望是过程观察面记录由算法计算得到的分数，可复现。实际是从种子文件读出的预置字面量——7 个脚本里没有任何打分或候选排序实现。该案例的「结果正确性」「执行轨迹」两项评分无效，责任层是知识与脚本，不是提示词。</p></div>
+          <div class="card"><div class="mini-label">自查发现 02</div><h3>运行包混进了 31 处评测答案</h3><p>21 处案例编号 + 10 处答案字段，分布在种子文件、6 个脚本、示例文档与决策参考里。三份隔离合同都写着「答案不得进入工作区」，但没有可复跑的检测器，合同就只是一句声明。被测系统运行时能读到答案，「100% 正确」的证据强度随之不足。</p></div>
+        </div>
+        <div class="reveal" style="margin-top:22px;">
+          <div class="mini-label" style="margin-bottom:10px;">失效链 · 每一环都是「本该分开的东西被放进了同一个地方」</div>
+          <div class="flow five">
+            <div class="flow-step"><strong>评审要求</strong><span>「GT 必须可判定」</span></div>
+            <div class="flow-step"><strong>把算法输出写死进 GT</strong><span>固定 A=0.82 B=0.71 Gap=0.11</span></div>
+            <div class="flow-step"><strong>运行时读到同一份文件</strong><span>种子文件同时装着输入与答案</span></div>
+            <div class="flow-step"><strong>判定通过</strong><span>过程面记「Score 计算 0.82/0.71 → Top2」</span></div>
+            <div class="flow-step"><strong>但没有实现</strong><span>代码里根本没有打分逻辑</span></div>
+          </div>
+        </div>
+        <div class="callout reveal" style="margin-top:14px;"><div class="mini-label">修复方式</div><div class="prose" style="font-size:13px;margin-top:8px;">按四平面合同把期望值与答案移出运行可读路径；新增一个每次构建都跑的隔离检测器。<b>泄漏从 31 处降到 0 处。</b>旧结论不沿用，受影响案例在修复后的版本上复评。</div></div>
+
+        <div class="subhead reveal"><span class="n">06</span><h3>重建隔离后重跑：评测台跑出了什么</h3></div>
+        <div class="stats reveal">
+          <div class="stat"><b>14</b><span>道题（13 道冻结 + 1 道新增）</span></div>
+          <div class="stat"><b>47</b><span>个场景</span></div>
+          <div class="stat"><b>232</b><span>条机器断言</span></div>
+          <div class="stat warn"><b>52</b><span>条人工判据（按定义不能硬转）</span></div>
+        </div>
+        <div class="two reveal" style="margin-top:14px;">
+          <div class="card" style="border-color:color-mix(in srgb, var(--danger) 30%, var(--line));"><div class="mini-label">最要紧的一条 · 已复现</div><h3>一句闲聊触发了不可逆写入</h3><p>生成一笔待确认记录后，用户说「最近心情不太好」。实测账本从 0 笔变成 1 笔，待确认状态被消费——一句闲聊把记录写进了账本。</p><p style="margin-top:10px;">根因不在「关键词匹配写松了」这一处，而是架构决定：确认路径按设计绕开模型。所以换模型、换提示词都救不了。这条已补进负例集，现在每次评测都会盯住它。</p></div>
+          <div class="card"><div class="mini-label">双跑对比 · 规则版 vs 模型版</div><h3>模型其实很少参与判定</h3>
+            <div class="tbl-wrap" style="margin-top:12px;">
+              <table class="dtable">
+                <thead><tr><th>分桶</th><th>场景数</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>两边都对</td><td class="num">31</td><td>规格与实现一致</td></tr>
+                  <tr><td>两边都缺</td><td class="num">14</td><td>差距不是模型带来的，是实现本身没做</td></tr>
+                  <tr><td>模型救回</td><td class="num">1</td><td>模型版会标出总笔数</td></tr>
+                  <tr><td>模型搞坏</td><td class="num">1</td><td>模型版丢了「基于有限数据」这个限定词</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="margin-top:12px;">模型只在 2 / 47 个场景上改变了判定——「模型参与率对结果的影响面 ≈ 4%」，第一次有了可复现的数字。</p>
+          </div>
+        </div>
+        <div class="callout reveal"><div class="mini-label">一致性检查 · 同一输入连跑三次</div><div class="quote" style="margin-top:8px;">最终 47 个场景全稳，飘 0 个。</div><div class="prose" style="margin-top:12px;font-size:13px;">但第一轮飘了 1 个。查下来不是实现不稳，是断言写歪了——模型说「没办法直接恢复」，正则只认连续的「没法」。规格里明写「措辞可变，语义要是恢复不了」，这条断言本就该容许同义说法。<b>同一输入跑 N 次，不只测模型，也测断言。</b></div></div>
+
+        <div class="subhead reveal"><span class="n">07</span><h3>四个只有真跑才会知道的结论</h3></div>
+        <div class="case-grid reveal">
+          <article class="case"><div class="case-top"><span class="pill bad">01</span><span class="pill">自我推翻</span></div><h3>绿灯可能是假的</h3><p>全 Pass 与「结论成立」之间没有必然关系。那次 12/12 全通过与「零行打分实现」，是同一次评测的两面。</p></article>
+          <article class="case"><div class="case-top"><span class="pill mid">02</span><span class="pill">量化</span></div><h3>模型参与率必须测出来</h3><p>设计上写着「模型负责判断」，实测 16 句真实输入里只有 2 句真正调用了模型（12.5%）；双跑对比下它对结果的影响面 ≈ 4%。参与率是指标，不是设计意图。</p></article>
+          <article class="case"><div class="case-top"><span class="pill mid">03</span><span class="pill">假失败</span></div><h3>断言自己也会假失败</h3><p>规格说「措辞可变」，断言就必须拿同义说法回归一遍。否则一次假失败会被误判成实现不稳定，然后去改本来正确的实现。</p></article>
+          <article class="case"><div class="case-top"><span class="pill ok">04</span><span class="pill">分类</span></div><h3>差距要分三类</h3><p>实现缺失 / 实现降级 / 规格冲突。混在一起记，改造时会去修那些本来就有意为之的降级。21 条差距全部带题号与判据出处，改造优先级按投入产出排，不按严重度排。</p></article>
+        </div>
+
+        <div class="subhead reveal"><span class="n">08</span><h3>现在的诚实边界</h3></div>
+        <div class="grid3 reveal">
+          <div class="card status-card">
+            <div class="mini-label">已跑完</div>
+            <div class="status-row"><span>12 原子案例 · 27 份测试数据</span><span class="status-value">五观察面判定完成</span></div>
+            <div class="status-row"><span>评测台 14 题 · 47 场景</span><span class="status-value">232 条机器断言</span></div>
+            <div class="status-row"><span>评测隔离检测</span><span class="status-value">0 处泄漏</span></div>
+            <div class="status-row"><span>规格差距</span><span class="status-value">21 差距 + 3 红线</span></div>
+          </div>
+          <div class="card status-card">
+            <div class="mini-label">未复跑 / 待复评</div>
+            <div class="status-row"><span>真实对话与真实动作观察面</span><span class="status-value">待复跑</span></div>
+            <div class="status-row"><span>旧结论对应的受影响案例</span><span class="status-value">待复评</span></div>
+            <div class="status-row"><span>1 个案例的期望值</span><span class="status-value">待人审</span></div>
+            <div class="status-row"><span>旧版评测结论</span><span class="status-value">已判定失效</span></div>
+          </div>
+          <div class="card status-card">
+            <div class="mini-label">离线评测证明不了</div>
+            <div class="status-row"><span>长期业务指标（需连续 3 个月）</span><span class="status-value">待验证</span></div>
+            <div class="status-row"><span>用户是否长期维护消费记忆</span><span class="status-value">待验证</span></div>
+            <div class="status-row"><span>主动追踪是价值还是打扰</span><span class="status-value">待验证</span></div>
+            <div class="status-row"><span>付费意愿</span><span class="status-value">待验证</span></div>
+          </div>
+        </div>
+        <div class="callout reveal"><div class="quote">评测的价值不在于证明我做对了，而在于告诉我哪里还没对。</div><div style="margin-top:12px;color:var(--muted);font-size:13px;">这一节里最贵的部分，是我推翻自己那次——但那也是整套体系真正开始起作用的地方。</div></div>
       </div>
     </section>
 
@@ -429,7 +613,7 @@ button { font: inherit; }
 
     <section class="section" id="validation">
       <div class="container">
-        <div class="section-head reveal"><div class="section-number">11 · 验证状态</div><div><h2 class="section-title">把“已经做了什么”和“还不知道什么”分开</h2><p class="section-lead">不把设计结果冒充成实验结果。当前作品集把证据状态明确区分。</p></div></div>
+        <div class="section-head reveal"><div class="section-number">11 · 验证状态</div><div><h2 class="section-title">把「已经做了什么」和「还不知道什么」分开</h2><p class="section-lead">不把设计结果冒充成实验结果。当前作品集把证据状态明确区分。</p></div></div>
         <div class="bottom-grid">
             <div class="card status-card reveal">
             <div class="mini-label">已完成</div>
@@ -437,11 +621,15 @@ button { font: inherit; }
             <div class="status-row"><span>用户旅程 / KUF / 用例</span><span class="status-value">已完成</span></div>
             <div class="status-row"><span>Agent / 记忆 / 状态 / CUI</span><span class="status-value">已完成</span></div>
             <div class="status-row"><span>交互原型</span><span class="status-value">已完成</span></div>
-            <div class="status-row"><span>原子案例 / 正确行为 / 判定规则</span><span class="status-value">已准备</span></div>
+            <div class="status-row"><span>原子案例 / 正确行为 / 判定规则</span><span class="status-value">已跑完</span></div>
+            <div class="status-row"><span>评测台 · 14 题 47 场景 232 断言</span><span class="status-value">已跑完</span></div>
+            <div class="status-row"><span>评测隔离检测</span><span class="status-value">0 处泄漏</span></div>
           </div>
             <div class="card status-card reveal">
             <div class="mini-label">仍待验证</div>
-            <div class="status-row"><span>Agent 实际识别 / 分类准确率</span><span class="status-value">待验证</span></div>
+            <div class="status-row"><span>真实对话与真实动作观察面复跑</span><span class="status-value">待复跑</span></div>
+            <div class="status-row"><span>受影响案例在修复后版本复评</span><span class="status-value">待复评</span></div>
+            <div class="status-row"><span>分类准确率（本地副本 61/61，冻结件复跑）</span><span class="status-value">待复跑</span></div>
             <div class="status-row"><span>用户是否持续使用买后追踪</span><span class="status-value">待验证</span></div>
             <div class="status-row"><span>模式洞察是否产生真实价值</span><span class="status-value">待验证</span></div>
             <div class="status-row"><span>主动性与打扰之间的平衡</span><span class="status-value">待验证</span></div>
